@@ -1,0 +1,27 @@
+@model IEnumerable<MyWebApp.Models.RedirectLog>
+@{
+    ViewData["Title"] = "Redirect Logs";
+}
+
+<h2>Redirect Logs</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Item Id</th>
+            <th>IP Address</th>
+            <th>Redirected At (UTC)</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in Model)
+    {
+        <tr>
+            <td>@log.Id</td>
+            <td>@log.ItemId</td>
+            <td>@log.IpAddress</td>
+            <td>@log.RedirectedAt.ToString("u")</td>
+        </tr>
+    }
+    </tbody>
+</table>
