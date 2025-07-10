@@ -16,7 +16,7 @@ namespace MyWebApp.Controllers
     {
         private readonly AppDbContext _context;
         private readonly ILogger<HomeController> _logger;
-        private const string BaseSiteUrl = "https://91216cc00132.ngrok-free.app/"; // Change to your deployed base URL
+        private const string BaseSiteUrl = "https://4809513c5614.ngrok-free.app"; // Change to your deployed base URL
 
         public HomeController(ILogger<HomeController> logger, AppDbContext context)
         {
