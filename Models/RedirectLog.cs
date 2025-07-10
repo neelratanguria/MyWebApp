@@ -1,3 +1,5 @@
+using System;
+
 namespace MyWebApp.Models
 {
     public class RedirectLog
