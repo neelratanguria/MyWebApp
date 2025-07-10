@@ -26,8 +26,8 @@ namespace MyWebApp.Controllers
 
         public IActionResult Index()
         {
-            var items = _context.Items.ToList();
-            return View(items);
+            var redirectData = _context.Redirect_data.ToList();
+            return View(redirectData);
         }
 
         [HttpPost]
@@ -40,7 +40,7 @@ namespace MyWebApp.Controllers
                 do
                 {
                     endpoint = Guid.NewGuid().ToString("N").Substring(0, 6);
-                } while (_context.Items.Any(i => i.OwnSiteUrl == endpoint));
+                } while (_context.Redirect_data.Any(i => i.OwnSiteUrl == endpoint));
 
                 var item = new Item
                 {
@@ -51,7 +51,7 @@ namespace MyWebApp.Controllers
                     CreatedDateTime = DateTime.UtcNow,
                     CreatedByName = createdByName
                 };
-                _context.Items.Add(item);
+                _context.Redirect_data.Add(item);
                 _context.SaveChanges();
             }
             return RedirectToAction("Index");
@@ -60,7 +60,7 @@ namespace MyWebApp.Controllers
         [HttpGet("/{endpoint}")]
         public IActionResult RedirectToUrl(string endpoint)
         {
-            var item = _context.Items.FirstOrDefault(i => i.OwnSiteUrl == endpoint);
+            var item = _context.Redirect_data.FirstOrDefault(i => i.OwnSiteUrl == endpoint);
             if (item == null)
                 return NotFound();
 
@@ -87,7 +87,7 @@ namespace MyWebApp.Controllers
         [HttpGet]
         public IActionResult QrCode(int id)
         {
-            var item = _context.Items.FirstOrDefault(i => i.Id == id);
+            var item = _context.Redirect_data.FirstOrDefault(i => i.Id == id);
             if (item == null)
                 return NotFound();
 

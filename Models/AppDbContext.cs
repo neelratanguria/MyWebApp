@@ -7,7 +7,7 @@ namespace MyWebApp.Models
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<Item> Items { get; set; }
+        public DbSet<Item> Redirect_data { get; set; }
         public DbSet<RedirectLog> RedirectLogs { get; set; }
     }
 }
