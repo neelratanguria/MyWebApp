@@ -37,18 +37,19 @@ namespace MyWebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddItem(string? title, string? description, string? forwardToUrl, string? createdByName, int locationId)
+        public IActionResult AddItem(string title, string description, string forwardToUrl, int locationId)
         {
-            if (!string.IsNullOrWhiteSpace(title) && !string.IsNullOrWhiteSpace(forwardToUrl) && locationId > 0)
+            if (!string.IsNullOrWhiteSpace(title) && 
+                !string.IsNullOrWhiteSpace(description) && 
+                !string.IsNullOrWhiteSpace(forwardToUrl) && 
+                locationId > 0)
             {
                 var item = new Item
                 {
                     Title = title,
-                    Description = description ?? string.Empty,
+                    Description = description,
                     ForwardToUrl = forwardToUrl,
-                    OwnSiteUrl = string.Empty, // No longer needed for redirection
                     CreatedDateTime = DateTime.UtcNow,
-                    CreatedByName = createdByName ?? string.Empty,
                     LocationId = locationId
                 };
                 _context.Redirect_data.Add(item);

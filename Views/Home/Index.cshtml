@@ -11,9 +11,8 @@
 <div class="mt-4">
     <form asp-action="AddItem" method="post">
         <input type="text" name="title" placeholder="Title" required />
-        <input type="text" name="description" placeholder="Description" />
+        <input type="text" name="description" placeholder="Description" required />
         <input type="url" name="forwardToUrl" placeholder="Forward To URL" required />
-        <input type="text" name="createdByName" placeholder="Created By Name" />
         <select name="locationId" class="form-control" required>
             <option value="">-- Select Location --</option>
             @if (ViewBag.Locations != null)
@@ -36,9 +35,9 @@
             @foreach (var item in Model)
             {
                 <li>
-                    <strong>@(item.Title ?? "No Title")</strong> - @(item.Description ?? "No Description")<br />
-                    <a href="/@item.Id" target="_blank">@item.Id</a> → <a href="@item.ForwardToUrl" target="_blank">@(item.ForwardToUrl ?? "#")</a><br />
-                    Created by: @(item.CreatedByName ?? "Unknown") on @item.CreatedDateTime.ToString("g")<br />
+                    <strong>@item.Title</strong> - @item.Description<br />
+                    <a href="/@item.Id" target="_blank">@item.Id</a> → <a href="@item.ForwardToUrl" target="_blank">@item.ForwardToUrl</a><br />
+                    Created on: @item.CreatedDateTime.ToString("g")<br />
                     @if (item.Location != null)
                     {
                         <span>Location: @item.Location.LocationName</span><br />
