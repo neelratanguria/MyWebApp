@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MyWebApp.Models;
 using QRCoder;
@@ -26,30 +28,28 @@ namespace MyWebApp.Controllers
 
         public IActionResult Index()
         {
-            var redirectData = _context.Redirect_data.ToList();
+            var redirectData = _context.Redirect_data.Include(r => r.Location).ToList();
+            
+            // Pass locations for the dropdown
+            ViewBag.Locations = new SelectList(_context.Locations.ToList(), "Id", "LocationName");
+            
             return View(redirectData);
         }
 
         [HttpPost]
-        public IActionResult AddItem(string title, string description, string forwardToUrl, string createdByName)
+        public IActionResult AddItem(string? title, string? description, string? forwardToUrl, string? createdByName, int locationId)
         {
-            if (!string.IsNullOrWhiteSpace(title) && !string.IsNullOrWhiteSpace(forwardToUrl))
+            if (!string.IsNullOrWhiteSpace(title) && !string.IsNullOrWhiteSpace(forwardToUrl) && locationId > 0)
             {
-                // Generate a unique 6-character endpoint
-                string endpoint;
-                do
-                {
-                    endpoint = Guid.NewGuid().ToString("N").Substring(0, 6);
-                } while (_context.Redirect_data.Any(i => i.OwnSiteUrl == endpoint));
-
                 var item = new Item
                 {
                     Title = title,
-                    Description = description,
+                    Description = description ?? string.Empty,
                     ForwardToUrl = forwardToUrl,
-                    OwnSiteUrl = endpoint,
+                    OwnSiteUrl = string.Empty, // No longer needed for redirection
                     CreatedDateTime = DateTime.UtcNow,
-                    CreatedByName = createdByName
+                    CreatedByName = createdByName ?? string.Empty,
+                    LocationId = locationId
                 };
                 _context.Redirect_data.Add(item);
                 _context.SaveChanges();
@@ -57,11 +57,11 @@ namespace MyWebApp.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpGet("/{endpoint}")]
-        public IActionResult RedirectToUrl(string endpoint)
+        [HttpGet("/{id:int}")]
+        public IActionResult RedirectToUrl(int id)
         {
-            var item = _context.Redirect_data.FirstOrDefault(i => i.OwnSiteUrl == endpoint);
-            if (item == null)
+            var item = _context.Redirect_data.FirstOrDefault(i => i.Id == id);
+            if (item == null || string.IsNullOrEmpty(item.ForwardToUrl))
                 return NotFound();
 
             // Register user IP and log with item primary key
@@ -75,7 +75,7 @@ namespace MyWebApp.Controllers
             _context.RedirectLogs.Add(log);
             _context.SaveChanges();
 
-            _logger.LogInformation($"Redirected: {endpoint} from IP: {userIp}");
+            _logger.LogInformation($"Redirected: {id} from IP: {userIp}");
             return RedirectPermanent(item.ForwardToUrl);
         }
 
@@ -91,8 +91,8 @@ namespace MyWebApp.Controllers
             if (item == null)
                 return NotFound();
 
-            // Build the full URL for the QR code
-            var fullUrl = BaseSiteUrl.TrimEnd('/') + "/" + item.OwnSiteUrl;
+            // Build the full URL for the QR code using the item ID
+            var fullUrl = BaseSiteUrl.TrimEnd('/') + "/" + item.Id;
             using (var qrGenerator = new QRCodeGenerator())
             {
                 var qrData = qrGenerator.CreateQrCode(fullUrl, QRCodeGenerator.ECCLevel.Q);

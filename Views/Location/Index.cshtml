@@ -1,0 +1,30 @@
+@model IEnumerable<MyWebApp.Models.Location>
+
+@{
+    ViewData["Title"] = "Locations";
+}
+
+<h2>Locations</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Location Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.LocationName</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <p>No locations found.</p>
+}

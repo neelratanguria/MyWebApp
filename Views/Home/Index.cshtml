@@ -14,6 +14,16 @@
         <input type="text" name="description" placeholder="Description" />
         <input type="url" name="forwardToUrl" placeholder="Forward To URL" required />
         <input type="text" name="createdByName" placeholder="Created By Name" />
+        <select name="locationId" class="form-control" required>
+            <option value="">-- Select Location --</option>
+            @if (ViewBag.Locations != null)
+            {
+                @foreach (SelectListItem location in ViewBag.Locations)
+                {
+                    <option value="@location.Value">@location.Text</option>
+                }
+            }
+        </select>
         <button type="submit">Add Short URL</button>
     </form>
 </div>
@@ -26,9 +36,13 @@
             @foreach (var item in Model)
             {
                 <li>
-                    <strong>@item.Title</strong> - @item.Description<br />
-                    <a href="/@item.OwnSiteUrl" target="_blank">@item.OwnSiteUrl</a> → <a href="@item.ForwardToUrl" target="_blank">@item.ForwardToUrl</a><br />
-                    Created by: @item.CreatedByName on @item.CreatedDateTime.ToString("g")
+                    <strong>@(item.Title ?? "No Title")</strong> - @(item.Description ?? "No Description")<br />
+                    <a href="/@item.Id" target="_blank">@item.Id</a> → <a href="@item.ForwardToUrl" target="_blank">@(item.ForwardToUrl ?? "#")</a><br />
+                    Created by: @(item.CreatedByName ?? "Unknown") on @item.CreatedDateTime.ToString("g")<br />
+                    @if (item.Location != null)
+                    {
+                        <span>Location: @item.Location.LocationName</span><br />
+                    }
                     <a href="@Url.Action("QrCode", "Home", new { id = item.Id })" target="_blank">[QR]</a>
                 </li>
             }
