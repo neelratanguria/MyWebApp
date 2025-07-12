@@ -8,9 +8,9 @@
     <thead>
         <tr>
             <th>Id</th>
-            <th>Item Id</th>
+            <th>QR Id</th>
             <th>IP Address</th>
-            <th>Redirected At (UTC)</th>
+            <th>Created On</th>
         </tr>
     </thead>
     <tbody>
@@ -18,9 +18,9 @@
     {
         <tr>
             <td>@log.Id</td>
-            <td>@log.ItemId</td>
+            <td>@log.QRId</td>
             <td>@log.IpAddress</td>
-            <td>@log.RedirectedAt.ToString("u")</td>
+            <td>@log.CreatedOn.ToString("g")</td>
         </tr>
     }
     </tbody>

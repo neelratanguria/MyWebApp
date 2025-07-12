@@ -28,31 +28,36 @@ namespace MyWebApp.Controllers
 
         public IActionResult Index()
         {
-            var redirectData = _context.Redirect_data.Include(r => r.Location).ToList();
+            var redirectData = _context.T_CEF_QR_DETAILS.ToList();
             
-            // Pass locations for the dropdown
-            ViewBag.Locations = new SelectList(_context.Locations.ToList(), "Id", "LocationName");
+            // Pass locations for the dropdown - show description but store code ID
+            ViewBag.Locations = new SelectList(_context.T_CODE_MASTER.ToList(), "CodeId", "CodeDescription");
+            
+            // Create a dictionary for location lookup
+            var locationLookup = _context.T_CODE_MASTER.ToDictionary(l => l.CodeId, l => l.CodeDescription);
+            ViewBag.LocationLookup = locationLookup;
             
             return View(redirectData);
         }
 
         [HttpPost]
-        public IActionResult AddItem(string title, string description, string forwardToUrl, int locationId)
+        public IActionResult AddItem(string title, string description, string forwardToUrl, string location)
         {
             if (!string.IsNullOrWhiteSpace(title) && 
                 !string.IsNullOrWhiteSpace(description) && 
                 !string.IsNullOrWhiteSpace(forwardToUrl) && 
-                locationId > 0)
+                !string.IsNullOrWhiteSpace(location))
             {
                 var item = new Item
                 {
                     Title = title,
                     Description = description,
                     ForwardToUrl = forwardToUrl,
+                    Location = location,
                     CreatedDateTime = DateTime.UtcNow,
-                    LocationId = locationId
+                    CreatedBy = "System"
                 };
-                _context.Redirect_data.Add(item);
+                _context.T_CEF_QR_DETAILS.Add(item);
                 _context.SaveChanges();
             }
             return RedirectToAction("Index");
@@ -61,7 +66,7 @@ namespace MyWebApp.Controllers
         [HttpGet("/{id:int}")]
         public IActionResult RedirectToUrl(int id)
         {
-            var item = _context.Redirect_data.FirstOrDefault(i => i.Id == id);
+            var item = _context.T_CEF_QR_DETAILS.FirstOrDefault(i => i.Id == id);
             if (item == null || string.IsNullOrEmpty(item.ForwardToUrl))
                 return NotFound();
 
@@ -69,11 +74,11 @@ namespace MyWebApp.Controllers
             var userIp = HttpContext.Connection.RemoteIpAddress?.ToString();
             var log = new RedirectLog
             {
-                ItemId = item.Id,
+                QRId = item.Id,
                 IpAddress = userIp,
-                RedirectedAt = DateTime.UtcNow
+                CreatedOn = DateTime.UtcNow
             };
-            _context.RedirectLogs.Add(log);
+            _context.T_CEF_QR_RedirectLogs.Add(log);
             _context.SaveChanges();
 
             _logger.LogInformation($"Redirected: {id} from IP: {userIp}");
@@ -88,7 +93,7 @@ namespace MyWebApp.Controllers
         [HttpGet]
         public IActionResult QrCode(int id)
         {
-            var item = _context.Redirect_data.FirstOrDefault(i => i.Id == id);
+            var item = _context.T_CEF_QR_DETAILS.FirstOrDefault(i => i.Id == id);
             if (item == null)
                 return NotFound();
 
@@ -106,7 +111,7 @@ namespace MyWebApp.Controllers
         [HttpGet]
         public IActionResult QrCodePage(int id)
         {
-            var item = _context.Redirect_data.Include(i => i.Location).FirstOrDefault(i => i.Id == id);
+            var item = _context.T_CEF_QR_DETAILS.FirstOrDefault(i => i.Id == id);
             if (item == null)
                 return NotFound();
 
@@ -127,7 +132,7 @@ namespace MyWebApp.Controllers
 
         public IActionResult RedirectLogs()
         {
-            var logs = _context.RedirectLogs.OrderByDescending(l => l.RedirectedAt).ToList();
+            var logs = _context.T_CEF_QR_RedirectLogs.OrderByDescending(l => l.CreatedOn).ToList();
             return View(logs);
         }
     }

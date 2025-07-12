@@ -3,17 +3,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyWebApp.Models
 {
-    [Table("LOCATION")]
+    [Table("T_CODE_MASTER")]
     public class Location
     {
         [Key]
-        [Column("ID")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        [Column("TCM_CODE_ID")]
+        [StringLength(20)]
+        public string CodeId { get; set; } = string.Empty;
 
-        [Column("LOCATION_NAME")]
-        [Required]
-        [StringLength(200)]
-        public string LocationName { get; set; } = string.Empty;
+        [Column("TCM_CODE_DES")]
+        [StringLength(255)]
+        public string? CodeDescription { get; set; }
+
+        [Column("TCM_TYPE_ID")]
+        [StringLength(20)]
+        public string? TypeId { get; set; }
     }
 }

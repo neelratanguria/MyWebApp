@@ -13,13 +13,13 @@
         <input type="text" name="title" placeholder="Title" required />
         <input type="text" name="description" placeholder="Description" required />
         <input type="url" name="forwardToUrl" placeholder="Forward To URL" required />
-        <select name="locationId" class="form-control" required>
+        <select name="location" class="form-control">
             <option value="">-- Select Location --</option>
             @if (ViewBag.Locations != null)
             {
-                @foreach (SelectListItem location in ViewBag.Locations)
+                @foreach (SelectListItem locationItem in ViewBag.Locations)
                 {
-                    <option value="@location.Value">@location.Text</option>
+                    <option value="@locationItem.Value">@locationItem.Text</option>
                 }
             }
         </select>
@@ -37,10 +37,16 @@
                 <li>
                     <strong>@item.Title</strong> - @item.Description<br />
                     <a href="/@item.Id" target="_blank">@item.Id</a> → <a href="@item.ForwardToUrl" target="_blank">@item.ForwardToUrl</a><br />
+                    @{
+                        var locationDescription = ViewBag.LocationLookup != null && ViewBag.LocationLookup.ContainsKey(item.Location) 
+                            ? ViewBag.LocationLookup[item.Location] 
+                            : item.Location;
+                    }
+                    Location: @locationDescription (@item.Location)<br />
                     Created on: @item.CreatedDateTime.ToString("g")<br />
-                    @if (item.Location != null)
+                    @if (!string.IsNullOrEmpty(item.CreatedBy))
                     {
-                        <span>Location: @item.Location.LocationName</span><br />
+                        <span>Created by: @item.CreatedBy</span><br />
                     }
                     <a href="@Url.Action("QrCodePage", "Home", new { id = item.Id })" target="_blank">[Print QR Code]</a>
                 </li>
