@@ -103,6 +103,22 @@ namespace MyWebApp.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult QrCodePage(int id)
+        {
+            var item = _context.Redirect_data.Include(i => i.Location).FirstOrDefault(i => i.Id == id);
+            if (item == null)
+                return NotFound();
+
+            // Build the full URL for the QR code using the item ID
+            var fullUrl = BaseSiteUrl.TrimEnd('/') + "/" + item.Id;
+            
+            ViewBag.FullUrl = fullUrl;
+            ViewBag.QrCodeUrl = Url.Action("QrCode", "Home", new { id = item.Id });
+            
+            return View(item);
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

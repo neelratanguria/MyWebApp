@@ -42,7 +42,7 @@
                     {
                         <span>Location: @item.Location.LocationName</span><br />
                     }
-                    <a href="@Url.Action("QrCode", "Home", new { id = item.Id })" target="_blank">[QR]</a>
+                    <a href="@Url.Action("QrCodePage", "Home", new { id = item.Id })" target="_blank">[Print QR Code]</a>
                 </li>
             }
         </ul>
